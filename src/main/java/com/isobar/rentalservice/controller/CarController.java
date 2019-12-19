@@ -2,6 +2,7 @@ package com.isobar.rentalservice.controller;
 
 import com.isobar.rentalservice.model.Car;
 import com.isobar.rentalservice.service.CarService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import javax.validation.Valid;
 import java.util.Objects;
 
 @RestController
+@Slf4j
 @RequestMapping("/car")
 public class CarController {
 
@@ -25,74 +27,58 @@ public class CarController {
   private CarService carService;
 
   @PostMapping
-  public ResponseEntity<Car> addCar(@Valid @RequestBody Car car){
-    ResponseEntity responseEntity;
-    if(Objects.nonNull(car)){
+  public ResponseEntity<?> addCar(@Valid @RequestBody Car car) {
+    log.info("car request {}", car);
+    try {
       Car carResponse = carService.save(car);
-      if(Objects.nonNull(carResponse)){
-        responseEntity = new ResponseEntity<>(carService.save(car), HttpStatus.CREATED);
-      }else{
-        responseEntity = new ResponseEntity<>("Error saving car details ", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-
-    } else{
-      responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      log.info("car response {}", carResponse);
+      return new ResponseEntity<>(carResponse, HttpStatus.CREATED);
+    } catch (Exception e) {
+      log.error("Failed to save car details {}", e.getMessage());
+      return new ResponseEntity<>("Error saving car details ", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return responseEntity;
 
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Car> fetchCar(@PathVariable Integer id){
-    ResponseEntity responseEntity;
-    if(Objects.nonNull(id)){
+  public ResponseEntity<?> fetchCar(@PathVariable Integer id){
+    log.info("Id {}", id);
+    try{
       Car carResponse = carService.getById(id);
-      if(Objects.nonNull(carResponse)){
-        responseEntity = new ResponseEntity<>(carResponse, HttpStatus.OK);
-      }else{
-        responseEntity = new ResponseEntity<>("Error fetching car details ", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-
-    }else{
-      responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      log.info("car response for requested id {}", carResponse);
+      return new ResponseEntity<>(carResponse, HttpStatus.OK);
+    }catch (Exception e){
+      log.error("Error while fetching car details {}", e.getMessage());
+      return new ResponseEntity<>("Error fetching car details ", HttpStatus.NOT_FOUND);
     }
-
-    return responseEntity;
   }
+
 
   @PutMapping("/id")
   public ResponseEntity<?> updateCar(@PathVariable Integer id, @Valid @RequestBody Car car){
-    ResponseEntity responseEntity;
-    if(Objects.nonNull(car)){
+    log.info("Id {}"+id +"&"+"Request car object {}",car);
+    try{
       Car carResponse = carService.getById(car.getId());
-      if(Objects.nonNull(carResponse)){
-        responseEntity = new ResponseEntity<>(carService.update(carResponse, car), HttpStatus.OK);
-      }else{
-        responseEntity = new ResponseEntity<>("Error updating car details ", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-
-    } else{
-      responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      log.info("existing car details "+ carResponse);
+      Car carUpdate = carService.update(carResponse, car);
+      log.info("Updated car details {}", carUpdate);
+      return new ResponseEntity<>(carUpdate, HttpStatus.OK);
+    }catch(Exception e){
+      log.error("Error while updating car details {}", e.getMessage());
+      return new ResponseEntity<>("Error while updating car details ", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return responseEntity;
-
   }
 
   @DeleteMapping("/id")
-  public void delete(@PathVariable Integer id){
-    ResponseEntity responseEntity;
-    if(Objects.nonNull(id)){
-
-      if(Objects.nonNull(carService.getById(id))){
-        carService.delete(id);
-        responseEntity = new ResponseEntity<>("car by id:"+id +"successfully deleted ", HttpStatus.OK);
-      }else{
-        responseEntity = new ResponseEntity<>("car by id:"+id +" not found ", HttpStatus.INTERNAL_SERVER_ERROR);
-      }
-    }else{
-      responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+  public ResponseEntity<?> delete(@PathVariable Integer id){
+    log.info("car Id to be deleted {}", id);
+    try{
+      carService.delete(id);
+      log.info("car deleted successfully");
+      return new ResponseEntity<>("car by id:"+id +"successfully deleted ", HttpStatus.OK);
+    }catch(Exception e){
+      log.error("Error while deleting car details {}", e.getMessage());
+      return new ResponseEntity<>("Error while deleting car details ", HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
