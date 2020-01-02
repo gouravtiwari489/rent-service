@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,18 +45,13 @@ public class BookingController {
       List<Driver> availableDrivers =  findAvailableDrivers(drivers);
 
       if(availableDrivers.size()>0){
-        //find available cars:
-        List<Car> carList = carService.findAll();
-        List<Car> availableCars = findAvailableCars(carList);
-        assignCarToDriver(availableDrivers, availableCars, booking);
-
-
+        assignCarToDriver(availableDrivers, booking);
 
       }else{
         //find available drivers from confirmed slots
       }
 
-      return new ResponseEntity<>(null, HttpStatus.CREATED);
+      return new ResponseEntity<>(bookingRepository.findById(booking.getContactNumber()), HttpStatus.OK);
     } catch (Exception e) {
       log.error("{}", e.getMessage());
       return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,32 +59,19 @@ public class BookingController {
 
   }
 
-  private void assignCarToDriver(final List<Driver> availableDrivers, final List<Car> availableCars, Booking booking) {
-    if(availableDrivers.size()>0 && availableCars.size()>0){
-      availableDrivers.get(0).setCar(availableCars.get(0));
-      availableCars.get(0).setDriver(availableDrivers.get(0));
-
+  private void assignCarToDriver(final List<Driver> availableDrivers, Booking booking) {
       availableDrivers.get(0).setBooking(booking);
       booking.setDriver(availableDrivers.get(0));
-      carRespository.save(availableCars.get(0));
-
-      //booking.setDriver(availableDrivers.get(0));
-      //availableDrivers.get(0).setBooking(booking);
-
-
-      bookingRepository.save(booking);
-
-
-    }
-
+      driverService.save(availableDrivers.get(0));
+      //bookingRepository.save(booking);
   }
 
   private List<Car> findAvailableCars(final List<Car> carList) {
     List<Car> availableCars = new ArrayList<>();
     for (Car car : carList) {
-      if(null == car.getDriver()){
+      //if(null == car.getDriver()){
         availableCars.add(car);
-      }
+      //}
     }
 
     return availableCars;
@@ -97,7 +80,7 @@ public class BookingController {
   private List<Driver> findAvailableDrivers(List<Driver> drivers) {
     List<Driver> availableDrivers = new ArrayList<>();
     for(Driver driver: drivers){
-      if(null == driver.getCar()){
+      if(null != driver.getCar()){
         availableDrivers.add(driver);
       }
     }

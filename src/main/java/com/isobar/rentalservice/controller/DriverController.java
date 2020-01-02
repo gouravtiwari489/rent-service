@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -77,10 +79,11 @@ public class DriverController {
 
   @GetMapping()
   public ResponseEntity<?> fetchAllDrivers(){
-    return new ResponseEntity<>(driverService.findAll(), HttpStatus.OK);
+    List<Driver> list = driverService.findAll();
+    return new ResponseEntity<>(findAssignedDrivers(list), HttpStatus.OK);
   }
 
-  @PutMapping("/id")
+  @PutMapping("/{id}")
   public ResponseEntity<?> updateDriver(@PathVariable Integer id, @Valid @RequestBody Driver driver){
     ResponseEntity responseEntity;
     if(Objects.nonNull(driver)){
@@ -100,26 +103,29 @@ public class DriverController {
   }
 
   @GetMapping("/assignCar/{driverId}")
-  public ResponseEntity<?> assignCar(@PathVariable Integer driverId, @Valid @RequestParam(name = "carId") Integer carId){
+  public ResponseEntity<?> assignCar(@PathVariable Integer driverId, @Valid @RequestParam(name = "carId") Integer carId)
+      throws Exception {
 
     Driver driver = driverService.getById(driverId);
+    List<Driver> drivers= driverService.findAll();
+
+    for(Driver driver1: drivers){
+      if(Objects.nonNull(driver1.getCar()) && driver1.getCar().getId().equals(carId)){
+        throw new Exception("Car is already assigned to a driver");
+      }
+    }
 
     Car car = carService.getById(carId);
 
-    //if(null == car.getDriver() && null == driver.getCar()){
+    if(null == driver.getCar()){
       driver.setCar(car);
       car.setDriver(driver);
-    //}
-
-
+    }
     carRespository.save(car);
-
-
-    return null;
-
+    return new ResponseEntity<>(driverService.getById(driverId), HttpStatus.OK);
   }
 
-  @DeleteMapping("/id")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> delete(@PathVariable Integer id){
     ResponseEntity responseEntity;
     if(Objects.nonNull(id)){
@@ -134,6 +140,16 @@ public class DriverController {
       responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
     return responseEntity;
+  }
+
+  private List<Driver> findAssignedDrivers(List<Driver> drivers) {
+    List<Driver> assignedDrivers = new ArrayList<>();
+    for(Driver driver: drivers){
+      if(null != driver.getCar()){
+        assignedDrivers.add(driver);
+      }
+    }
+    return assignedDrivers;
   }
 
 }

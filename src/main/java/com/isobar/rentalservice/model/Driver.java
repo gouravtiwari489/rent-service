@@ -29,9 +29,6 @@ public class Driver {
   @Column(name = "driverAge")
   private String  driverAge;
 
-  /*@OneToMany(targetEntity=TimeSlot.class, mappedBy="driver", fetch= FetchType.EAGER)
-  private List<TimeSlot> timeSlots;*/
-
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "car_id", referencedColumnName = "id")
   private Car car;
@@ -40,9 +37,9 @@ public class Driver {
   @JoinColumn(name = "contact_number", referencedColumnName = "contactNumber")
   private Booking booking;
 
-  public Booking getBooking() {
+  /*public Booking getBooking() {
     return booking;
-  }
+  }*/
 
   public void setBooking(final Booking booking) {
     this.booking = booking;

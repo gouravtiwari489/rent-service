@@ -54,7 +54,7 @@ public class CarController {
   }
 
 
-  @PutMapping("/id")
+  @PutMapping("/{id}")
   public ResponseEntity<?> updateCar(@PathVariable Integer id, @Valid @RequestBody Car car){
     log.info("Id {}"+id +"&"+"Request car object {}",car);
     try{
@@ -69,7 +69,7 @@ public class CarController {
     }
   }
 
-  @DeleteMapping("/id")
+  @DeleteMapping("/{id}")
   public ResponseEntity<?> delete(@PathVariable Integer id){
     log.info("car Id to be deleted {}", id);
     try{

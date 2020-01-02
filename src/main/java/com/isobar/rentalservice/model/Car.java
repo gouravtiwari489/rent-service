@@ -42,9 +42,9 @@ public class Car {
     this.id = id;
   }
 
-  public Driver getDriver() {
+  /*public Driver getDriver() {
     return driver;
-  }
+  }*/
 
   public void setDriver(final Driver driver) {
     this.driver = driver;
