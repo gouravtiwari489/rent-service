@@ -2,6 +2,7 @@ package com.isobar.rentalservice.controller;
 
 import com.isobar.rentalservice.Repositories.BookingRepository;
 import com.isobar.rentalservice.Repositories.CarRespository;
+import com.isobar.rentalservice.Repositories.DriverRespository;
 import com.isobar.rentalservice.model.Booking;
 import com.isobar.rentalservice.model.Car;
 import com.isobar.rentalservice.model.Driver;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Slf4j
@@ -34,36 +36,47 @@ public class BookingController {
   private BookingRepository bookingRepository;
   @Autowired
   private CarRespository carRespository;
+  @Autowired
+  private DriverRespository driverRespository;
 
   @PostMapping
   public ResponseEntity<?> addCar(@Valid @RequestBody Booking booking) {
     log.info("booking request {}", booking);
     try {
-
-      //find list
       List<Driver>  drivers =driverService.findAll();
       List<Driver> availableDrivers =  findAvailableDrivers(drivers);
 
       if(availableDrivers.size()>0){
         assignCarToDriver(availableDrivers, booking);
 
-      }else{
+      }/*else{
         //find available drivers from confirmed slots
-      }
+      }*/
 
       return new ResponseEntity<>(bookingRepository.findById(booking.getContactNumber()), HttpStatus.OK);
     } catch (Exception e) {
       log.error("{}", e.getMessage());
-      return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
   }
 
-  private void assignCarToDriver(final List<Driver> availableDrivers, Booking booking) {
+  private void assignCarToDriver(final List<Driver> availableDrivers, Booking booking) throws Exception {
+
+    List<Booking> bookings = bookingRepository.findAll();
+
+    for(Booking booking1: bookings){
+      if(Objects.nonNull(booking1.getContactNumber()) && booking1.getContactNumber().equals(booking.getContactNumber())){
+
+        throw new Exception("Don't over book MR x");
+      }
+    }
+
       availableDrivers.get(0).setBooking(booking);
       booking.setDriver(availableDrivers.get(0));
+      availableDrivers.get(0).setStatus("Confirmed");
       driverService.save(availableDrivers.get(0));
-      //bookingRepository.save(booking);
+
   }
 
   private List<Car> findAvailableCars(final List<Car> carList) {
@@ -80,7 +93,7 @@ public class BookingController {
   private List<Driver> findAvailableDrivers(List<Driver> drivers) {
     List<Driver> availableDrivers = new ArrayList<>();
     for(Driver driver: drivers){
-      if(null != driver.getCar()){
+      if(null != driver.getCar() && driver.getStatus().equals("AVAILABLE")){
         availableDrivers.add(driver);
       }
     }

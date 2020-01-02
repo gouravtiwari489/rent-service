@@ -23,7 +23,7 @@ public class Car {
   private String  modelNumber;
   private String  brand;
   private String  color;
-  private String  bookingStatus;
+  /*private String  bookingStatus;*/
 
 
   /*@OneToOne(cascade = CascadeType.ALL)
@@ -50,13 +50,13 @@ public class Car {
     this.driver = driver;
   }
 
-  public String getBookingStatus() {
+  /*public String getBookingStatus() {
     return bookingStatus;
   }
 
   public void setBookingStatus(final String bookingStatus) {
     this.bookingStatus = bookingStatus;
-  }
+  }*/
 
   public String getModelNumber() {
     return modelNumber;
@@ -95,12 +95,11 @@ public class Car {
            modelNumber.equals(car.modelNumber) &&
            brand.equals(car.brand) &&
            color.equals(car.color) &&
-           bookingStatus.equals(car.bookingStatus) &&
            driver.equals(car.driver);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, modelNumber, brand, color, bookingStatus, driver);
+    return Objects.hash(id, modelNumber, brand, color, driver);
   }
 }

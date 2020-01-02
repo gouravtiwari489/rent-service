@@ -111,7 +111,7 @@ public class DriverController {
 
     for(Driver driver1: drivers){
       if(Objects.nonNull(driver1.getCar()) && driver1.getCar().getId().equals(carId)){
-        throw new Exception("Car is already assigned to a driver");
+        throw new Exception("Car is already assigned to a driver, please choose from available car list");
       }
     }
 

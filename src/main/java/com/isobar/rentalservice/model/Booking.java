@@ -37,8 +37,6 @@ public class Booking {
     this.endTime = endTime;
   }
 
-  //private String status;
-
   @OneToOne(mappedBy = "booking")
   private Driver driver;
 

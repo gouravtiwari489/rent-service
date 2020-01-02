@@ -29,6 +29,21 @@ public class Driver {
   @Column(name = "driverAge")
   private String  driverAge;
 
+  @Column(name = "status")
+  private String status;
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(final String status) {
+    this.status = status;
+  }
+
+  /*public Booking getBooking() {
+    return booking;
+  }*/
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "car_id", referencedColumnName = "id")
   private Car car;
@@ -44,14 +59,6 @@ public class Driver {
   public void setBooking(final Booking booking) {
     this.booking = booking;
   }
-
-  /*public List<TimeSlot> getTimeSlots() {
-    return timeSlots;
-  }
-
-  public void setTimeSlots(final List<TimeSlot> timeSlots) {
-    this.timeSlots = timeSlots;
-  }*/
 
   public Integer getId() {
     return id;
