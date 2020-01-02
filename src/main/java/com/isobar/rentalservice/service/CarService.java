@@ -5,6 +5,8 @@ import com.isobar.rentalservice.model.Car;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CarService {
 
@@ -26,5 +28,9 @@ public class CarService {
 
   public void delete(Integer id) {
     carRespository.deleteById(id);
+  }
+
+  public List<Car> findAll() {
+    return carRespository.findAll();
   }
 }

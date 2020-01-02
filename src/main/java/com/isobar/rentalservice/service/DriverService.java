@@ -7,6 +7,8 @@ import com.isobar.rentalservice.model.Driver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DriverService {
 
@@ -29,4 +31,9 @@ public class DriverService {
   public void delete(Integer id) {
     driverRespository.deleteById(id);
   }
+
+  public List<Driver> findAll(){
+    return driverRespository.findAll();
+  }
+
 }

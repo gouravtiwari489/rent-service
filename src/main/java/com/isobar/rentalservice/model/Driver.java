@@ -1,5 +1,7 @@
 package com.isobar.rentalservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +15,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "driver")
-public class  Driver {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Driver {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +29,32 @@ public class  Driver {
   @Column(name = "driverAge")
   private String  driverAge;
 
+  /*@OneToMany(targetEntity=TimeSlot.class, mappedBy="driver", fetch= FetchType.EAGER)
+  private List<TimeSlot> timeSlots;*/
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "car_id", referencedColumnName = "id")
   private Car car;
 
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "contact_number", referencedColumnName = "contactNumber")
+  private Booking booking;
 
+  public Booking getBooking() {
+    return booking;
+  }
+
+  public void setBooking(final Booking booking) {
+    this.booking = booking;
+  }
+
+  /*public List<TimeSlot> getTimeSlots() {
+    return timeSlots;
+  }
+
+  public void setTimeSlots(final List<TimeSlot> timeSlots) {
+    this.timeSlots = timeSlots;
+  }*/
 
   public Integer getId() {
     return id;

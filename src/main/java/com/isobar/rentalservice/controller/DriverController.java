@@ -77,8 +77,7 @@ public class DriverController {
 
   @GetMapping()
   public ResponseEntity<?> fetchAllDrivers(){
-
-    return new ResponseEntity<>(driverRespository.findAll(), HttpStatus.OK);
+    return new ResponseEntity<>(driverService.findAll(), HttpStatus.OK);
   }
 
   @PutMapping("/id")
@@ -107,7 +106,7 @@ public class DriverController {
 
     Car car = carService.getById(carId);
 
-    //if(null ==driver.getCar()){
+    //if(null == car.getDriver() && null == driver.getCar()){
       driver.setCar(car);
       car.setDriver(driver);
     //}
