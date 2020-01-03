@@ -22,10 +22,11 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
-@RequestMapping("/book")
+@RequestMapping("/booking")
 public class BookingController {
 
   @Autowired
@@ -40,7 +41,7 @@ public class BookingController {
   private DriverRespository driverRespository;
 
   @PostMapping
-  public ResponseEntity<?> addCar(@Valid @RequestBody Booking booking) {
+  public ResponseEntity<?> bookCar(@Valid @RequestBody Booking booking) {
     log.info("booking request {}", booking);
     try {
       List<Driver>  drivers =driverService.findAll();
@@ -59,6 +60,25 @@ public class BookingController {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+  }
+
+  @GetMapping()
+  public ResponseEntity<?> fetchActiveBookings(){
+    List<Booking> bookings = bookingRepository.findAll();
+    List<Booking> activeBookings = filterActiveBookings(bookings);
+
+    return new ResponseEntity<>(activeBookings, HttpStatus.OK);
+  }
+
+  private List<Booking> filterActiveBookings(final List<Booking> bookings) {
+
+    return bookings.stream().filter(booking -> {
+      if(booking.getDriver().getStatus()!= "AVAILABLE" && booking.getDriver().getStatus()!= null){
+        return true;
+      }else{
+        return false;
+      }
+    }).collect(Collectors.toList());
   }
 
   private void assignCarToDriver(final List<Driver> availableDrivers, Booking booking) throws Exception {
